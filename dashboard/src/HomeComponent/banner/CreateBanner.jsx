@@ -1,5 +1,3 @@
-"use client";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -14,9 +12,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { log } from "console";
 
 const formSchema = z.object({
   title: z.string().min(2),
@@ -32,6 +29,36 @@ const formSchema = z.object({
 
 export default function CreateBanner() {
   const [imagePreview, setImagePreview] = useState(null);
+  const [banners, setBanners] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchBanner = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(
+          "http://localhost:4000/api/v1/banner/all-banner",
+          { signal: controller.signal }
+        );
+        setBanners(response.data.data || []);
+        console.log(banners, "ok");
+      } catch (err) {
+        if (axios.isCancel(err)) {
+          console.log("Request canceled:", err.message);
+        } else {
+          setError(err.response?.data || err);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchBanner();
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -49,16 +76,31 @@ export default function CreateBanner() {
   });
 
   async function onSubmit(values) {
-    // console.log("Final Banner Payload:", ...values);
-    const response = await axios.post(
-      "http://localhost:4000/api/v1/banner/create-banner",
-      values,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+    console.log("Final Banner Payload:", values);
+    try {
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("description", values.description);
+      formData.append("targetUrl", values.targetUrl);
+      formData.append("targetType", values.targetType);
+      formData.append("isActive", values.isActive);
+      formData.append("priority", values.priority);
+      if (values.startDate) formData.append("startDate", values.startDate);
+      if (values.endDate) formData.append("endDate", values.endDate);
+      formData.append("image", values.image);
+      const response = await axios.post(
+        "http://localhost:4000/api/v1/banner/create-banner",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log("Final Banner Payload:", response?.data);
+    } catch (err) {
+      console.log("Banner create failed:", err.response?.data || err);
+    }
   }
 
   return (
