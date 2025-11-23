@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { api } from "../../utils/axios";
 
 const formSchema = z.object({
   title: z.string().min(2),
@@ -38,10 +39,9 @@ export default function CreateBanner() {
     const fetchBanner = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          "http://localhost:4000/api/v1/banner/all-banner",
-          { signal: controller.signal }
-        );
+        const response = await api.get("/banner/all-banner", {
+          signal: controller.signal,
+        });
         setBanners(response.data.data || []);
         console.log(banners, "ok");
       } catch (err) {
@@ -88,15 +88,11 @@ export default function CreateBanner() {
       if (values.startDate) formData.append("startDate", values.startDate);
       if (values.endDate) formData.append("endDate", values.endDate);
       formData.append("image", values.image);
-      const response = await axios.post(
-        "http://localhost:4000/api/v1/banner/create-banner",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await api.post("/banner/create-banner", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       console.log("Final Banner Payload:", response?.data);
     } catch (err) {
       console.log("Banner create failed:", err.response?.data || err);
