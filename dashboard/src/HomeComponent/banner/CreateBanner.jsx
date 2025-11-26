@@ -30,35 +30,6 @@ const formSchema = z.object({
 
 export default function CreateBanner() {
   const [imagePreview, setImagePreview] = useState(null);
-  const [banners, setBanners] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    const fetchBanner = async () => {
-      try {
-        setLoading(true);
-        const response = await api.get("/banner/all-banner", {
-          signal: controller.signal,
-        });
-        setBanners(response.data.data || []);
-        console.log(banners, "ok");
-      } catch (err) {
-        if (axios.isCancel(err)) {
-          console.log("Request canceled:", err.message);
-        } else {
-          setError(err.response?.data || err);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBanner();
-    return () => {
-      controller.abort();
-    };
-  }, []);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
