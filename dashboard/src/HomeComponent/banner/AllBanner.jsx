@@ -1,5 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { api } from "../../utils/axios";
+import { it } from "zod/v4/locales";
 
 const AllBanner = () => {
   const [banners, setBanners] = useState([]);
@@ -51,7 +53,7 @@ const AllBanner = () => {
                 </div>
               </th>
               <th scope="col" class="px-6 py-3 font-medium">
-                image
+                Image
               </th>
               <th scope="col" class="px-6 py-3 font-medium">
                 Products Name
@@ -85,7 +87,7 @@ const AllBanner = () => {
           <tbody>
             {banners?.map((item) => (
               <tr
-                key={item.id}
+                key={item._id}
                 class="bg-neutral-primary-soft border-b border-default hover:bg-neutral-secondary-medium"
               >
                 <td class="w-4 p-4">
@@ -105,16 +107,20 @@ const AllBanner = () => {
                   scope="row"
                   class="px-6 py-4 font-medium text-heading whitespace-nowrap"
                 >
-                  {item.title}
+                  <img
+                    src={item.image.url}
+                    alt="product img"
+                    className="w-24 h-16 object-cover bg-gray-300"
+                  />
                 </th>
-                <td class="px-6 py-4">Silver</td>
-                <td class="px-6 py-4">Laptop</td>
-                <td class="px-6 py-4">Yes</td>
-                <td class="px-6 py-4">Yes</td>
-                <td class="px-6 py-4">$2999</td>
-                <td class="px-6 py-4">3.0 lb.</td>
-                <td class="px-6 py-4">$2999</td>
-                <td class="px-6 py-4">3.0 lb.</td>
+                <td class="px-6 py-4"> {item.title}</td>
+                <td class="px-6 py-4"> {item.description}</td>
+                <td class="px-6 py-4"> {item.targetUrl}</td>
+                <td class="px-6 py-4"> {item.targetType}</td>
+                <td class="px-6 py-4"> {item.priority}</td>
+                <td class="px-6 py-4"> {item.startDate}</td>
+                <td class="px-6 py-4"> {item.endDate}</td>
+                <td class="px-6 py-4"> {item.isActive}</td>
                 <td class="flex items-center px-6 py-4">
                   <a href="#" class="font-medium text-fg-brand hover:underline">
                     Edit
