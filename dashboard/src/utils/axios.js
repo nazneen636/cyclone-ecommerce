@@ -25,19 +25,20 @@ api.interceptors.request.use(
     return response;
   },
   async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+    }
     try {
-      const originalRequest = error.config;
-      if (error.response?.status === 401 && !originalRequest._retry) {
-        originalRequest._retry = true;
-        const res = await api.post(
-          "/auth/refresh",
-          {},
-          { withCredentials: true }
-        );
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/${
+          import.meta.env.VITE_BASE_API
+        }/auth/refresh`,
+        { withCredentials: true }
+      );
 
-        const newAccessToken = res.data.accessToken;
-        localStorage.setItem("accessToken", newAccessToken);
-      }
+      const newAccessToken = res.data.accessToken;
+      localStorage.setItem("accessToken", newAccessToken);
     } catch (error) {}
   }
 );
