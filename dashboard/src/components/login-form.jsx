@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { api } from "../utils/axios";
-
+import { useNavigate } from "react-router";
 export function LoginForm({ className, ...props }) {
   const form = useForm({
     defaultValues: {
@@ -25,9 +25,18 @@ export function LoginForm({ className, ...props }) {
       password: "",
     },
   });
+  const navigate = useNavigate();
   const onSubmit = async (values) => {
-    const response = await api.post(`/auth/login`, values);
-    console.log(response);
+    try {
+      const response = await api.post(`/auth/login`, values, {
+        withCredentials: true,
+      });
+      localStorage.setItem("accessToken", response.data.data?.accessToken);
+      console.log(response);
+      navigate("/create-banner");
+    } catch (error) {
+      console.log("login failed", error?.response?.data || error);
+    }
   };
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
