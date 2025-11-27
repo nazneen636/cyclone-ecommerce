@@ -51,10 +51,7 @@ export function SignupForm({ className, ...props }) {
   });
 
   const onSubmit = async (values) => {
-    const response = await axios.post(
-      `http://localhost:4000/api/v1/auth/registration`,
-      values
-    );
+    const response = await api.post(`/auth/registration`, values);
     console.log("Submitted:", response);
   };
   return (

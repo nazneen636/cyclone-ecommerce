@@ -15,14 +15,18 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
+import { useForm } from "react-hook-form";
+import { api } from "../utils/axios";
 
 export function LoginForm({ className, ...props }) {
-  const handleSubmit = async (e, values) => {
-    e.preventDefault();
-    const response = await axios.post(
-      `http://localhost:4000/api/v1/auth/login`,
-      values
-    );
+  const form = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+  const onSubmit = async (values) => {
+    const response = await api.post(`/auth/login`, values);
     console.log(response);
   };
   return (
@@ -35,7 +39,7 @@ export function LoginForm({ className, ...props }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -43,7 +47,7 @@ export function LoginForm({ className, ...props }) {
                   id="email"
                   type="email"
                   placeholder="m@example.com"
-                  required
+                  {...form.register("email", { required: true })}
                 />
               </Field>
               <Field>
@@ -56,7 +60,12 @@ export function LoginForm({ className, ...props }) {
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  {...form.register("password", { required: true })}
+                />
               </Field>
               <Field>
                 <Button type="submit">Login</Button>
